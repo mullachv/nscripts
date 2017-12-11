@@ -142,4 +142,16 @@ if ( (Get-Item $mytProvRolesXml).length -le 6Mb ) {
 	#exit 11
 }
 
+#
+# Export the AD Account Templates 
+#
+$adsAccountTemplates = $BackupLocation + '\ADSPolicies.ldif'
+$dxsearch = "D:\Program Files\CA\Directory\dxserver\bin\dxsearch.exe"
+$pwd='mypassword'
+$dxargs = (" -LLL -D " + '"eTGlobalUserName=idmadmin,eTGlobalUserContainerName=Global Users,eTNamespaceName=CommonObjects,dc=im,dc=eta"' +  " -w " + $pwd + " -h provdir..mycompany.com -p 20389 -b  " + '"eTADSPolicyContainerName=Active Directory Policies,eTNamespaceName=CommonObjects,dc=im,dc=eta"'  + " -x -s sub " + '"(eTADSPolicyName=*)"' + " " ) 
+& $dxsearch $dxargs.split(" ") > $adsAccountTemplates
+if ( (Get-Item $adsAccountTemplates).length -le 1Mb ) {
+	Write-Error "Failed to export ADS Account Templates"
+	exit 12
+}
 
